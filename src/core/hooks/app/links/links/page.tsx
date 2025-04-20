@@ -34,7 +34,7 @@ export default function LinksPage() {
 
     if (res.ok) {
       const newLink = await res.json()
-      setLinks((prev) => [...prev, newLink])
+      setLinks((prev) => [...prev, { id: Date.now(), title, url }])
       setTitle('')
       setUrl('')
     }
@@ -43,9 +43,9 @@ export default function LinksPage() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">My Smart Links</h1>
-      <p className="text-muted-foreground mb-6">Here you can manage your profile links.</p>
+      <p className="text-muted-foreground mb-6">Add and manage your profile links.</p>
 
-      <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+      <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <input
           placeholder="Link title"
           value={title}
@@ -53,7 +53,7 @@ export default function LinksPage() {
           className="w-full p-2 border rounded"
         />
         <input
-          placeholder="https://example.com"
+          placeholder="https://yourlink.com"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           className="w-full p-2 border rounded"
