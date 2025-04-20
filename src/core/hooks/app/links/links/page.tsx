@@ -34,9 +34,19 @@ export default function LinksPage() {
 
     if (res.ok) {
       const newLink = await res.json()
-      setLinks((prev) => [...prev, { id: Date.now(), title, url }])
+      setLinks((prev) => [...prev, newLink])
       setTitle('')
       setUrl('')
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    const res = await fetch(`/api/links/${id}`, {
+      method: 'DELETE',
+    })
+
+    if (res.ok) {
+      setLinks((prev) => prev.filter((link) => link.id !== id))
     }
   }
 
@@ -65,9 +75,17 @@ export default function LinksPage() {
 
       <div className="space-y-4">
         {links.map((link) => (
-          <div key={link.id} className="p-4 border rounded-lg shadow-sm">
-            <p className="font-medium">{link.title}</p>
-            <p className="text-sm text-muted-foreground">{link.url}</p>
+          <div key={link.id} className="p-4 border rounded-lg shadow-sm flex justify-between items-center">
+            <div>
+              <p className="font-medium">{link.title}</p>
+              <p className="text-sm text-muted-foreground">{link.url}</p>
+            </div>
+            <button
+              onClick={() => handleDelete(link.id)}
+              className="text-red-600 hover:underline text-sm"
+            >
+              Delete
+            </button>
           </div>
         ))}
       </div>
