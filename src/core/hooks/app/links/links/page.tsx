@@ -10,6 +10,8 @@ type Link = {
 
 export default function LinksPage() {
   const [links, setLinks] = useState<Link[]>([])
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
 
   useEffect(() => {
     const fetchLinks = async () => {
@@ -21,10 +23,45 @@ export default function LinksPage() {
     fetchLinks()
   }, [])
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const res = await fetch('/api/links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, url }),
+    })
+
+    if (res.ok) {
+      const newLink = await res.json()
+      setLinks((prev) => [...prev, newLink])
+      setTitle('')
+      setUrl('')
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">My Smart Links</h1>
       <p className="text-muted-foreground mb-6">Here you can manage your profile links.</p>
+
+      <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+        <input
+          placeholder="Link title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+        <input
+          placeholder="https://example.com"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+        <button type="submit" className="w-full bg-black text-white p-2 rounded">
+          Add Link
+        </button>
+      </form>
 
       <div className="space-y-4">
         {links.map((link) => (
