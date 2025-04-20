@@ -14,18 +14,20 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   const { title, url } = await req.json()
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('links')
     .update({ title, url })
     .eq('id', params.id)
     .eq('user_id', user.id)
+    .select()
+    .single()
 
   if (error) {
     console.error('Update error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true }, { status: 200 })
+  return NextResponse.json(data, { status: 200 })
 }
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
