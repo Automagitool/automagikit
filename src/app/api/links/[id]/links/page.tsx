@@ -82,7 +82,7 @@ export default function LinksPage() {
             </div>
             <button
               onClick={() => handleDelete(link.id)}
-              className="text-sm text-red-500 hover:underline"
+              className="text-red-600 hover:underline text-sm"
             >
               Delete
             </button>
