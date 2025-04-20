@@ -1,29 +1,28 @@
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
 
 export async function POST(req: Request) {
-  const supabase = createClient()
-  const user = await supabase.auth.getUser()
+  const supabase = createRouteHandlerClient({ cookies })
 
-  if (!user.data.user) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
-  const body = await req.json()
-  const { name, industry, goal } = body
+  const { name, industry, goal } = await req.json()
 
   const { error } = await supabase
-    .from('projects')
-    .insert({
-      user_id: user.data.user.id,
-      name,
-      industry,
-      goal,
-    })
+    .from('onboarding_state')
+    .insert([{ user_id: user.id, name, industry, goal }])
 
   if (error) {
+    console.error('Insert error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true }, { status: 200 })
 }

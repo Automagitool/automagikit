@@ -1,13 +1,29 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function OnboardingPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [industry, setIndustry] = useState('')
   const [goal, setGoal] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  // ✅ Check if user has already onboarded
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const res = await fetch('/api/onboarding/check')
+      const data = await res.json()
+      if (data.alreadyOnboarded) {
+        router.push('/dashboard')
+      } else {
+        setLoading(false)
+      }
+    }
+
+    checkOnboarding()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,6 +36,10 @@ export default function OnboardingPage() {
     if (res.ok) {
       router.push('/dashboard')
     }
+  }
+
+  if (loading) {
+    return <p className="text-center p-6">Loading...</p>
   }
 
   return (
