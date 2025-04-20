@@ -12,6 +12,9 @@ export default function LinksPage() {
   const [links, setLinks] = useState<Link[]>([])
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editUrl, setEditUrl] = useState('')
 
   useEffect(() => {
     const fetchLinks = async () => {
@@ -50,10 +53,37 @@ export default function LinksPage() {
     }
   }
 
+  const handleEdit = (link: Link) => {
+    setEditingId(link.id)
+    setEditTitle(link.title)
+    setEditUrl(link.url)
+  }
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!editingId) return
+
+    const res = await fetch(`/api/links/${editingId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: editTitle, url: editUrl }),
+    })
+
+    if (res.ok) {
+      setLinks((prev) =>
+        prev.map((link) =>
+          link.id === editingId ? { ...link, title: editTitle, url: editUrl } : link
+        )
+      )
+      setEditingId(null)
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">My Smart Links</h1>
-      <p className="text-muted-foreground mb-6">Add and manage your profile links.</p>
+      <p className="text-muted-foreground mb-6">Add, edit or remove your profile links.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <input
@@ -75,17 +105,57 @@ export default function LinksPage() {
 
       <div className="space-y-4">
         {links.map((link) => (
-          <div key={link.id} className="p-4 border rounded-lg shadow-sm flex justify-between items-center">
-            <div>
-              <p className="font-medium">{link.title}</p>
-              <p className="text-sm text-muted-foreground">{link.url}</p>
-            </div>
-            <button
-              onClick={() => handleDelete(link.id)}
-              className="text-red-600 hover:underline text-sm"
-            >
-              Delete
-            </button>
+          <div key={link.id} className="p-4 border rounded-lg shadow-sm">
+            {editingId === link.id ? (
+              <form onSubmit={handleUpdate} className="space-y-2">
+                <input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+                <input
+                  value={editUrl}
+                  onChange={(e) => setEditUrl(e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    className="bg-black text-white px-4 py-2 rounded"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingId(null)}
+                    className="text-gray-600 hover:underline"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-medium">{link.title}</p>
+                  <p className="text-sm text-muted-foreground">{link.url}</p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleEdit(link)}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(link.id)}
+                    className="text-red-600 hover:underline text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
