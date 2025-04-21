@@ -10,12 +10,15 @@ export async function middleware(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // 👤 Kun redirect til forside hvis ikke logget ind
-  if (!user && req.nextUrl.pathname !== '/') {
+  const currentPath = req.nextUrl.pathname
+
+  // 👉 Hvis ikke logget ind og prøver at tilgå andet end forsiden, redirect til /
+  if (!user && currentPath !== '/') {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // 🚫 Ingen onboarding-check her
+  // 🚫 Vi fjerner al onboarding-redirect her
+
   return res
 }
 
