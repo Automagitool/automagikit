@@ -7,22 +7,17 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
 
-  console.log('🧠 Middleware is running') // Til debug i logs
-
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   const currentPath = req.nextUrl.pathname
-  console.log('📍 Path:', currentPath)
 
-  // 👉 Hvis ikke logget ind og prøver at tilgå andet end forsiden, redirect til /
+  // Hvis brugeren ikke er logget ind, redirect til forsiden
   if (!user && currentPath !== '/') {
-    console.log('🔁 Redirecting to /')
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // ⚠️ Vi slår al onboarding-logik fra her
   return res
 }
 
