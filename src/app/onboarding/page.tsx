@@ -1,3 +1,4 @@
+// ✅ src/app/onboarding/page.tsx
 'use client'
 
 import { useRouter } from 'next/navigation'
