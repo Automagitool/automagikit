@@ -1,4 +1,3 @@
-// ✅ src/middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
@@ -13,7 +12,6 @@ export async function middleware(req: NextRequest) {
 
   const currentPath = req.nextUrl.pathname
 
-  // Hvis brugeren ikke er logget ind, redirect til forsiden
   if (!user && currentPath !== '/') {
     return NextResponse.redirect(new URL('/', req.url))
   }
