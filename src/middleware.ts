@@ -27,20 +27,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  if (user) {
-    const { data, error } = await supabase
-      .from('onboarding_state')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
-    console.log('📦 Onboarding lookup:', { data, error })
-
-    if (!data && currentPath !== '/onboarding') {
-      console.log('🔁 Redirect: No onboarding → /onboarding')
-      return NextResponse.redirect(new URL('/onboarding', req.url))
-    }
-  }
+  // 🔕 Onboarding bypassed midlertidigt
+  console.log('⚠️ Onboarding check midlertidigt deaktiveret')
 
   console.log('✅ Middleware end → continue')
   return res
