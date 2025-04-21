@@ -1,11 +1,16 @@
-// src/core/hooks/useLocalInfo.ts
+// ✅ src/core/hooks/useLocalInfo.ts
+'use client'
 
-export const useLocalInfo = () => {
-    return {
-      userRole: 'admin',            // 'admin', 'user', 'guest' etc.
-      page: 'dashboard',           // fx 'dashboard', 'settings', 'auth/login'
-      mode: 'view',                // 'view', 'edit', 'create'
-      context: 'organization',     // fx 'organization', 'task', 'billing'
-    }
-  }
-  
+import { useEffect, useState } from 'react'
+
+export function useLocalInfo() {
+  const [timezone, setTimezone] = useState('')
+  const [language, setLanguage] = useState('')
+
+  useEffect(() => {
+    setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    setLanguage(navigator.language)
+  }, [])
+
+  return { timezone, language }
+}
