@@ -17,8 +17,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // 🚫 Vi fjerner al onboarding-redirect her
-
+  // 🚫 Fjernet onboarding-tjek
   return res
 }
 
