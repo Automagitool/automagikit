@@ -3,6 +3,8 @@ import type { NextRequest } from 'next/server'
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 
 export async function middleware(req: NextRequest) {
+  console.log('🧠 Middleware is running') // 👈 Log der tjekker om middleware kører
+
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
 
@@ -12,10 +14,12 @@ export async function middleware(req: NextRequest) {
 
   const currentPath = req.nextUrl.pathname
 
+  // 👮 Hvis IKKE logget ind og prøver at tilgå andet end /, redirect til forsiden
   if (!user && currentPath !== '/') {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
+  // 🚫 Onboarding-tjek er fjernet
   return res
 }
 
