@@ -1,8 +1,13 @@
+// ✅ src/components/CreateLinkForm.tsx
 'use client'
 
 import { useState } from 'react'
 
-export default function CreateLinkForm({ onLinkCreated }: { onLinkCreated: () => void }) {
+type Props = {
+  onLinkCreated: (link: { id: number; title: string; url: string }) => void
+}
+
+export default function CreateLinkForm({ onLinkCreated }: Props) {
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -18,16 +23,17 @@ export default function CreateLinkForm({ onLinkCreated }: { onLinkCreated: () =>
     })
 
     if (res.ok) {
+      const newLink = await res.json()
+      onLinkCreated(newLink)
       setTitle('')
       setUrl('')
-      onLinkCreated()
     }
 
     setLoading(false)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6 space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-4 mb-8">
       <input
         placeholder="Link title"
         value={title}
@@ -36,14 +42,18 @@ export default function CreateLinkForm({ onLinkCreated }: { onLinkCreated: () =>
         required
       />
       <input
-        placeholder="Link URL"
+        placeholder="https://yourlink.com"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         className="w-full p-2 border rounded"
         required
       />
-      <button type="submit" disabled={loading} className="w-full bg-black text-white p-2 rounded">
-        {loading ? 'Adding...' : 'Add Link'}
+      <button
+        type="submit"
+        className="w-full bg-black text-white p-2 rounded disabled:opacity-50"
+        disabled={loading}
+      >
+        {loading ? 'Saving...' : 'Add Link'}
       </button>
     </form>
   )
