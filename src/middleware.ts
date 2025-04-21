@@ -9,16 +9,24 @@ export async function middleware(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return res
+  const currentPath = req.nextUrl.pathname
 
-  const { data, error } = await supabase
-    .from('onboarding_state')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle()
+  // 👉 Hvis ikke logget ind og prøver at tilgå andet end forsiden, redirect til /
+  if (!user && currentPath !== '/') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
 
-  if (!data && req.nextUrl.pathname !== '/onboarding') {
-    return NextResponse.redirect(new URL('/onboarding', req.url))
+  // 👉 Hvis logget ind, men onboarding mangler, redirect til /onboarding
+  if (user) {
+    const { data, error } = await supabase
+      .from('onboarding_state')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (!data && currentPath !== '/onboarding') {
+      return NextResponse.redirect(new URL('/onboarding', req.url))
+    }
   }
 
   return res
