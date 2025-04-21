@@ -5,18 +5,28 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
+
+  console.log('📍 Middleware start')
+
   const {
     data: { user },
+    error: userError
   } = await supabase.auth.getUser()
 
-  const currentPath = req.nextUrl.pathname
+  if (userError) {
+    console.error('❌ Error getting user:', userError)
+  }
 
-  // 👉 Hvis ikke logget ind og prøver at tilgå andet end forsiden, redirect til /
+  console.log('👤 User:', user)
+
+  const currentPath = req.nextUrl.pathname
+  console.log('📍 Current path:', currentPath)
+
   if (!user && currentPath !== '/') {
+    console.log('🔁 Redirect: Not logged in → /')
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // 👉 Hvis logget ind, men onboarding mangler, redirect til /onboarding
   if (user) {
     const { data, error } = await supabase
       .from('onboarding_state')
@@ -24,11 +34,15 @@ export async function middleware(req: NextRequest) {
       .eq('user_id', user.id)
       .maybeSingle()
 
+    console.log('📦 Onboarding lookup:', { data, error })
+
     if (!data && currentPath !== '/onboarding') {
+      console.log('🔁 Redirect: No onboarding → /onboarding')
       return NextResponse.redirect(new URL('/onboarding', req.url))
     }
   }
 
+  console.log('✅ Middleware end → continue')
   return res
 }
 
