@@ -12,12 +12,10 @@ export async function middleware(req: NextRequest) {
 
   const currentPath = req.nextUrl.pathname
 
-  // 👉 Hvis ikke logget ind og prøver at tilgå andet end forsiden, redirect til /
   if (!user && currentPath !== '/') {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // 🚫 Fjernet onboarding-tjek
   return res
 }
 
