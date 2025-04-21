@@ -9,19 +9,18 @@ export async function GET() {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ alreadyOnboarded: false }, { status: 200 })
+    return NextResponse.json({ alreadyOnboarded: false }, { status: 401 })
   }
 
   const { data, error } = await supabase
     .from('onboarding_state')
     .select('id')
     .eq('user_id', user.id)
-    .maybeSingle()
+    .single()
 
-  if (error) {
-    console.error('Check error:', error)
-    return NextResponse.json({ alreadyOnboarded: false }, { status: 200 })
+  if (error || !data) {
+    return NextResponse.json({ alreadyOnboarded: false })
   }
 
-  return NextResponse.json({ alreadyOnboarded: !!data }, { status: 200 })
+  return NextResponse.json({ alreadyOnboarded: true })
 }
